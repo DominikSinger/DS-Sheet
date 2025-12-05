@@ -70,11 +70,17 @@ npm run dev
 
 ## 📚 Dokumentation
 
+### Für Entwickler
+- **[QUICKSTART.md](./QUICKSTART.md)** - 🚀 Schnelleinstieg in 5 Minuten
 - **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Detaillierte Systemarchitektur und Technologieentscheidungen
 - **[PWA-SETUP.md](./PWA-SETUP.md)** - Installation und Konfiguration als Progressive Web App
 - **[DEPLOYMENT.md](./DEPLOYMENT.md)** - Komplette Deployment-Anleitung für On-Premise
 - **[server/README.md](./server/README.md)** - Backend-Dokumentation
 - **[desktop/README.md](./desktop/README.md)** - Electron-Desktop-App
+
+### Für End-User (Musiker)
+- **[INSTALL-ANDROID.md](./INSTALL-ANDROID.md)** - 📱 Android-Installation (PWA)
+- **[INSTALL-WINDOWS.md](./INSTALL-WINDOWS.md)** - 🖥️ Windows-Installation (Desktop-App)
 
 ## 🎹 Fußpedal-Unterstützung
 
