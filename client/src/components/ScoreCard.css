@@ -1,0 +1,91 @@
+.score-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  gap: 1rem;
+}
+
+.score-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #646cff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(100, 108, 255, 0.2);
+}
+
+.score-card:active {
+  transform: translateY(0);
+}
+
+.score-card-icon {
+  font-size: 2.5rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.score-card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.score-card-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.score-card-folder {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.score-card-meta {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.score-card-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+@media (max-width: 768px) {
+  .score-card {
+    padding: 1rem;
+  }
+
+  .score-card-icon {
+    font-size: 2rem;
+  }
+
+  .score-card-title {
+    font-size: 1rem;
+  }
+
+  .score-card-meta {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}
+
+@media (hover: none) {
+  .score-card {
+    min-height: 100px;
+  }
+}

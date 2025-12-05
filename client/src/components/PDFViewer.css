@@ -1,0 +1,88 @@
+.pdf-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  cursor: pointer;
+  position: relative;
+}
+
+.pdf-loading,
+.pdf-error,
+.page-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  gap: 1rem;
+}
+
+.pdf-error {
+  color: #f44336;
+}
+
+/* react-pdf Styles Override */
+.react-pdf__Document {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.react-pdf__Page {
+  max-width: 100%;
+  height: auto !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.react-pdf__Page__canvas {
+  max-width: 100%;
+  height: auto !important;
+}
+
+/* Touch-Zonen (für Debugging, auskommentiert im Component) */
+.touch-zones {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  pointer-events: none;
+  opacity: 0.1;
+}
+
+.zone {
+  flex: 1;
+  border: 2px dashed white;
+}
+
+.zone-left {
+  flex: 0.3;
+  background: rgba(255, 0, 0, 0.2);
+}
+
+.zone-center {
+  flex: 0.4;
+  background: rgba(0, 255, 0, 0.2);
+}
+
+.zone-right {
+  flex: 0.3;
+  background: rgba(0, 0, 255, 0.2);
+}
+
+@media (orientation: portrait) {
+  .react-pdf__Page {
+    width: 95vw !important;
+  }
+}
+
+@media (orientation: landscape) {
+  .react-pdf__Page {
+    height: 90vh !important;
+    width: auto !important;
+  }
+}

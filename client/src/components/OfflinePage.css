@@ -1,0 +1,32 @@
+.offline-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  text-align: center;
+}
+
+.offline-content {
+  max-width: 400px;
+}
+
+.offline-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.5;
+}
+
+.offline-page h1 {
+  margin-bottom: 1rem;
+  font-size: 2rem;
+}
+
+.offline-page p {
+  margin: 0.5rem 0;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.offline-page button {
+  margin-top: 2rem;
+}
