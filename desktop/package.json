@@ -1,0 +1,72 @@
+{
+  "name": "ds-sheet-desktop",
+  "version": "1.0.0",
+  "description": "DS-Sheet Desktop App - Digitale Noten für Windows, macOS und Linux",
+  "main": "dist/main.js",
+  "scripts": {
+    "dev": "tsc && electron dist/main.js",
+    "build": "tsc",
+    "start": "electron dist/main.js",
+    "package:win": "electron-builder --win --x64",
+    "package:mac": "electron-builder --mac",
+    "package:linux": "electron-builder --linux",
+    "package:all": "electron-builder -mwl"
+  },
+  "keywords": ["music", "sheets", "pdf", "viewer", "electron"],
+  "author": "DS-Sheet Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.0",
+    "typescript": "^5.3.3"
+  },
+  "build": {
+    "appId": "com.dssheet.desktop",
+    "productName": "DS-Sheet",
+    "directories": {
+      "output": "release",
+      "buildResources": "assets"
+    },
+    "files": [
+      "dist/**/*",
+      "assets/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "../client/dist",
+        "to": "app",
+        "filter": ["**/*"]
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "mac": {
+      "target": ["dmg", "zip"],
+      "category": "public.app-category.music",
+      "icon": "assets/icon.icns"
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "category": "Audio",
+      "icon": "assets/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}
