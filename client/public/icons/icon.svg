@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4CAF50;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2E7D32;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Hintergrund -->
+  <rect width="512" height="512" rx="80" fill="url(#grad)"/>
+  
+  <!-- Notenlinien -->
+  <g stroke="#ffffff" stroke-width="8" opacity="0.9">
+    <line x1="80" y1="180" x2="432" y2="180"/>
+    <line x1="80" y1="220" x2="432" y2="220"/>
+    <line x1="80" y1="260" x2="432" y2="260"/>
+    <line x1="80" y1="300" x2="432" y2="300"/>
+    <line x1="80" y1="340" x2="432" y2="340"/>
+  </g>
+  
+  <!-- Violinschlüssel (vereinfacht) -->
+  <path d="M 200 160 Q 220 140 240 160 Q 260 180 240 220 L 230 280 Q 228 320 240 340 Q 250 360 230 370 Q 210 380 200 360 Q 190 340 200 320 L 210 260 Q 212 230 200 210 Q 180 190 200 160 Z" 
+        fill="#ffffff" opacity="0.95"/>
+  
+  <!-- Note -->
+  <circle cx="320" cy="280" r="28" fill="#ffffff" opacity="0.95"/>
+  <ellipse cx="320" cy="280" rx="24" ry="20" fill="url(#grad)"/>
+  <rect x="344" y="200" width="8" height="80" fill="#ffffff" opacity="0.95"/>
+</svg>
