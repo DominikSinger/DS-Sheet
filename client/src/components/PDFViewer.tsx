@@ -19,7 +19,6 @@ interface PDFViewerProps {
 function PDFViewer({
   scoreId,
   currentPage,
-  onPageChange,
   onLoadSuccess,
   onTouchZone,
 }: PDFViewerProps) {

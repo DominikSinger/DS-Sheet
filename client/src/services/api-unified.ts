@@ -7,8 +7,10 @@ import axios from 'axios';
 import type { ScoreListResponse, ScoreDetailResponse, HealthResponse, FolderListResponse } from '../types/score';
 import { localDB, type LocalScore } from './localDatabase';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
-const USE_LOCAL_MODE = import.meta.env.VITE_LOCAL_MODE === 'true' || !API_BASE_URL;
+const API_BASE_URL = typeof window !== 'undefined' && window.location.hostname !== 'localhost' 
+  ? `${window.location.protocol}//${window.location.hostname}:3000` 
+  : 'http://localhost:3000';
+const USE_LOCAL_MODE = false; // Disabled for now
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -39,8 +41,9 @@ export const scoresApi = {
     if (USE_LOCAL_MODE) {
       return {
         status: 'ok',
-        message: 'Local mode active',
-        timestamp: new Date().toISOString(),
+        noteRoot: '/local',
+        accessible: true,
+        scoreCount: 0,
       };
     }
     
@@ -50,9 +53,11 @@ export const scoresApi = {
     } catch (error) {
       // Fallback to local mode if server unavailable
       return {
-        status: 'ok',
-        message: 'Server unavailable - using local mode',
-        timestamp: new Date().toISOString(),
+        status: 'error',
+        noteRoot: '/local',
+        accessible: false,
+        scoreCount: 0,
+        error: 'Server unavailable',
       };
     }
   },
@@ -106,8 +111,17 @@ export const scoresApi = {
         throw new Error('Score not found');
       }
       
+      // Convert to ScoreDetailResponse format
       return {
-        score: localScoreToApiFormat(score),
+        id: score.id,
+        filename: score.title,
+        relativePath: '',
+        folder: score.folder || '',
+        fileSize: score.fileSize || 0,
+        modifiedAt: score.updatedAt,
+        pages: score.pageCount ?? null,
+        indexedAt: score.createdAt,
+        exists: true,
       };
     }
     
@@ -123,8 +137,17 @@ export const scoresApi = {
         throw error;
       }
       
+      // Convert to ScoreDetailResponse format
       return {
-        score: localScoreToApiFormat(score),
+        id: score.id,
+        filename: score.title,
+        relativePath: '',
+        folder: score.folder || '',
+        fileSize: score.fileSize || 0,
+        modifiedAt: score.updatedAt,
+        pages: score.pageCount ?? null,
+        indexedAt: score.createdAt,
+        exists: true,
       };
     }
   },
@@ -164,7 +187,7 @@ export const scoresApi = {
       const folders = await localDB.getFolders();
       
       return {
-        folders: folders.map(name => ({ name, count: 0 })),
+        folders: folders,
       };
     }
     
@@ -177,7 +200,7 @@ export const scoresApi = {
       const folders = await localDB.getFolders();
       
       return {
-        folders: folders.map(name => ({ name, count: 0 })),
+        folders: folders,
       };
     }
   },
