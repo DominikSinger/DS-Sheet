@@ -51,6 +51,17 @@ export const scoresApi = {
 
   // PDF-URL für einen Score
   getScoreFileUrl: (id: string): string => {
+    // Prüfe ob es eine lokale Datei ist
+    if (id.startsWith('local-')) {
+      const storedFiles = localStorage.getItem('ds_sheet_local_files');
+      if (storedFiles) {
+        const paths = JSON.parse(storedFiles) as string[];
+        const index = parseInt(id.replace('local-', ''));
+        if (index >= 0 && index < paths.length) {
+          return paths[index]; // Lokaler Dateipfad
+        }
+      }
+    }
     return `${getApiBaseUrl()}/api/scores/${id}/file`;
   },
 

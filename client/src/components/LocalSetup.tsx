@@ -47,6 +47,8 @@ function LocalSetup({ onComplete }: LocalSetupProps) {
         return;
       }
 
+      setError('Wähle mehrere PDF-Dateien aus dem Ordner aus...');
+
       const result = await FilePicker.pickFiles({
         types: ['application/pdf'],
         readData: false,
@@ -62,6 +64,9 @@ function LocalSetup({ onComplete }: LocalSetupProps) {
           const folderPath = firstPath.substring(0, firstPath.lastIndexOf('/'));
           setFolderPath(folderPath);
           setError('');
+          
+          // Speichere Dateipfade für später
+          localStorage.setItem('ds_sheet_local_files', JSON.stringify(paths));
         }
       }
     } catch (err) {
@@ -84,10 +89,30 @@ function LocalSetup({ onComplete }: LocalSetupProps) {
       return;
     }
 
-    // Speichere Pfad
-    localStorage.setItem('ds_sheet_local_folder', pathToSave);
-    localStorage.setItem('ds_sheet_mode', 'local');
-    onComplete(pathToSave);
+    setError('Scanne Ordner nach PDF-Dateien...');
+
+    // Versuche Ordner zu scannen
+    try {
+      const scanResult = await localFileService.scanDirectory(pathToSave);
+      
+      if (scanResult.errors.length > 0) {
+        console.warn('Scan-Fehler:', scanResult.errors);
+      }
+
+      // Wenn Dateien ausgewählt wurden, speichere diese
+      if (selectedFiles.length > 0) {
+        localStorage.setItem('ds_sheet_local_files', JSON.stringify(selectedFiles));
+      }
+
+      // Speichere Konfiguration
+      localStorage.setItem('ds_sheet_local_folder', pathToSave);
+      localStorage.setItem('ds_sheet_mode', 'local');
+      
+      onComplete(pathToSave);
+    } catch (err) {
+      console.error('Fehler beim Scannen:', err);
+      setError('Konnte Ordner nicht scannen. Versuche es mit manuellem Dateipicker.');
+    }
   };
 
   const commonFolders = [

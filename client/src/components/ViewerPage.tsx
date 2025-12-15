@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useScoreDetail } from '../hooks/useScores';
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
@@ -17,10 +17,24 @@ function ViewerPage({ mode = 'server' }: ViewerPageProps) {
   
   // Mode wird später für lokale vs. Server-PDFs genutzt
   const isLocalMode = mode === 'local';
-  if (isLocalMode) {
-    // TODO: Lade PDF von lokalem Speicher
-    console.log('Lokaler Modus aktiv');
-  }
+  const [localFile, setLocalFile] = useState<{filename: string; path: string} | null>(null);
+  
+  // Lade lokale Datei-Info wenn im lokalen Modus
+  useEffect(() => {
+    if (isLocalMode && id?.startsWith('local-')) {
+      const storedFiles = localStorage.getItem('ds_sheet_local_files');
+      if (storedFiles) {
+        const paths = JSON.parse(storedFiles) as string[];
+        const index = parseInt(id.replace('local-', ''));
+        if (index >= 0 && index < paths.length) {
+          setLocalFile({
+            filename: paths[index].split('/').pop() || 'Unknown',
+            path: paths[index],
+          });
+        }
+      }
+    }
+  }, [isLocalMode, id]);
   const [currentPage, setCurrentPage] = useState(1);
   const [numPages, setNumPages] = useState<number | null>(null);
   const [showControls, setShowControls] = useState(true);
@@ -64,7 +78,7 @@ function ViewerPage({ mode = 'server' }: ViewerPageProps) {
     }
   };
 
-  if (error) {
+  if (!isLocalMode && error) {
     return (
       <div className="viewer-error">
         <h2>❌ Fehler beim Laden</h2>
@@ -74,7 +88,7 @@ function ViewerPage({ mode = 'server' }: ViewerPageProps) {
     );
   }
 
-  if (isLoading || !scoreDetail) {
+  if (!isLocalMode && (isLoading || !scoreDetail)) {
     return (
       <div className="viewer-loading">
         <div className="spinner"></div>
@@ -83,7 +97,16 @@ function ViewerPage({ mode = 'server' }: ViewerPageProps) {
     );
   }
 
-  if (!scoreDetail.exists) {
+  if (isLocalMode && !localFile) {
+    return (
+      <div className="viewer-loading">
+        <div className="spinner"></div>
+        <p>Lade lokale Datei...</p>
+      </div>
+    );
+  }
+
+  if (!isLocalMode && scoreDetail && !scoreDetail.exists) {
     return (
       <div className="viewer-error">
         <h2>⚠️ Datei nicht gefunden</h2>
@@ -93,6 +116,8 @@ function ViewerPage({ mode = 'server' }: ViewerPageProps) {
     );
   }
 
+  const displayFilename = isLocalMode ? localFile?.filename : scoreDetail?.filename;
+
   return (
     <div className={`viewer-page ${isFullscreen ? 'fullscreen' : ''}`}>
       {showControls && (
@@ -100,7 +125,7 @@ function ViewerPage({ mode = 'server' }: ViewerPageProps) {
           <button className="back-button" onClick={handleBack}>
             ← Zurück
           </button>
-          <h2 className="viewer-title">{scoreDetail.filename}</h2>
+          <h2 className="viewer-title">{displayFilename}</h2>
           <div className="viewer-info">
             Seite {currentPage} / {numPages || '...'}
           </div>

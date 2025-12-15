@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useScores, useHealth } from '../hooks/useScores';
 import SearchBar from './SearchBar';
@@ -14,16 +14,42 @@ function LibraryView({ mode = 'server' }: LibraryViewProps) {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFolder, setSelectedFolder] = useState<string>('');
+  const [localFiles, setLocalFiles] = useState<Array<{id: string; filename: string; path: string}>>([]);
+  const [isLoadingLocal, setIsLoadingLocal] = useState(false);
   
-  // Mode wird später für lokale vs. Server-Daten genutzt
   const isLocalMode = mode === 'local';
-  if (isLocalMode) {
-    // TODO: Implementiere lokalen Datenzugriff
-    console.log('Lokaler Modus aktiv');
-  }
   
-  const { data: scoresData, isLoading, error } = useScores(searchTerm, selectedFolder);
-  const { data: healthData } = useHealth();
+  // Lade lokale Dateien wenn im lokalen Modus
+  useEffect(() => {
+    if (isLocalMode) {
+      loadLocalFiles();
+    }
+  }, [isLocalMode]);
+
+  const loadLocalFiles = () => {
+    try {
+      setIsLoadingLocal(true);
+      const storedFiles = localStorage.getItem('ds_sheet_local_files');
+      
+      if (storedFiles) {
+        const paths = JSON.parse(storedFiles) as string[];
+        const files = paths.map((path, index) => ({
+          id: `local-${index}`,
+          filename: path.split('/').pop() || 'Unknown',
+          path: path,
+          folder: path.substring(0, path.lastIndexOf('/')),
+        }));
+        setLocalFiles(files);
+      }
+    } catch (err) {
+      console.error('Fehler beim Laden lokaler Dateien:', err);
+    } finally {
+      setIsLoadingLocal(false);
+    }
+  };
+  
+  const { data: scoresData, isLoading, error } = useScores(searchTerm, selectedFolder, !isLocalMode);
+  const { data: healthData } = useHealth(!isLocalMode);
 
   // Extrahiere eindeutige Ordner
   const folders = useMemo(() => {
@@ -36,7 +62,7 @@ function LibraryView({ mode = 'server' }: LibraryViewProps) {
     navigate(`/viewer/${id}`);
   };
 
-  if (error) {
+  if (!isLocalMode && error) {
     return (
       <div className="library-view">
         <div className="error-message">
@@ -48,7 +74,7 @@ function LibraryView({ mode = 'server' }: LibraryViewProps) {
           <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
             <button onClick={() => window.location.reload()}>Neu laden</button>
             <button 
-              onClick={() => window.location.href = '/config'}
+              onClick={() => window.location.href = '/config/server'}
               style={{ background: '#2196F3' }}
             >
               Server konfigurieren
@@ -59,12 +85,27 @@ function LibraryView({ mode = 'server' }: LibraryViewProps) {
     );
   }
 
+  // Wähle Datenquelle basierend auf Modus
+  const displayScores = isLocalMode ? localFiles : (scoresData?.scores || []);
+  const loading = isLocalMode ? isLoadingLocal : isLoading;
+
   return (
     <div className="library-view">
       <header className="library-header">
         <h1>🎵 Musiknoten-Bibliothek</h1>
         
-        {healthData && (
+        <div className="mode-indicator" style={{
+          padding: '8px 16px',
+          background: isLocalMode ? '#4CAF50' : '#2196F3',
+          color: 'white',
+          borderRadius: '8px',
+          fontSize: '14px',
+          fontWeight: 'bold'
+        }}>
+          {isLocalMode ? '📁 Lokal' : '🌐 Server'}
+        </div>
+        
+        {!isLocalMode && healthData && (
           <div className="health-status">
             <span className={`status-indicator ${healthData.status}`}>
               {healthData.status === 'ok' ? '✓' : '✗'}
@@ -77,7 +118,7 @@ function LibraryView({ mode = 'server' }: LibraryViewProps) {
       <div className="library-controls">
         <SearchBar value={searchTerm} onChange={setSearchTerm} />
         
-        {folders.length > 0 && (
+        {!isLocalMode && folders.length > 0 && (
           <select 
             className="folder-filter"
             value={selectedFolder}
@@ -89,28 +130,55 @@ function LibraryView({ mode = 'server' }: LibraryViewProps) {
             ))}
           </select>
         )}
+
+        {isLocalMode && (
+          <button 
+            onClick={() => window.location.href = '/config/local'}
+            style={{
+              padding: '10px 20px',
+              background: '#FF9800',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}
+          >
+            Ordner ändern
+          </button>
+        )}
       </div>
 
       <InstallPrompt />
 
-      {isLoading ? (
+      {loading ? (
         <div className="loading-indicator">
           <div className="spinner"></div>
           <p>Lade Noten...</p>
         </div>
       ) : (
         <div className="scores-grid">
-          {scoresData?.scores.map(score => (
-            <ScoreCard
-              key={score.id}
-              score={score}
-              onClick={() => handleScoreClick(score.id)}
-            />
-          ))}
-          {scoresData?.scores.length === 0 && (
+          {displayScores
+            .filter((score: any) => {
+              if (!searchTerm) return true;
+              const filename = score.filename || '';
+              return filename.toLowerCase().includes(searchTerm.toLowerCase());
+            })
+            .map((score: any) => (
+              <ScoreCard
+                key={score.id}
+                score={score}
+                onClick={() => handleScoreClick(score.id)}
+              />
+            ))}
+          {displayScores.length === 0 && (
             <div className="empty-state">
               <p>Keine Noten gefunden</p>
-              {searchTerm && <p>Versuche einen anderen Suchbegriff</p>}
+              {isLocalMode ? (
+                <p>Wähle einen Ordner mit PDF-Dateien aus</p>
+              ) : searchTerm ? (
+                <p>Versuche einen anderen Suchbegriff</p>
+              ) : null}
             </div>
           )}
         </div>
