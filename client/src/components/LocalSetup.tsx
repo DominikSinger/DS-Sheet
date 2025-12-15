@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { localFileService } from '../services/localFileService';
+import { FilePicker } from '@capawesome/capacitor-file-picker';
+import { Capacitor } from '@capacitor/core';
 import './LocalSetup.css';
 
 interface LocalSetupProps {
@@ -11,6 +13,7 @@ function LocalSetup({ onComplete }: LocalSetupProps) {
   const [isChecking, setIsChecking] = useState(true);
   const [folderPath, setFolderPath] = useState('');
   const [error, setError] = useState('');
+  const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
 
   useEffect(() => {
     checkPermissions();
@@ -37,16 +40,54 @@ function LocalSetup({ onComplete }: LocalSetupProps) {
     }
   };
 
+  const handleFilePicker = async () => {
+    try {
+      if (!Capacitor.isNativePlatform()) {
+        setError('Dateiauswahl ist nur auf mobilen Geräten verfügbar');
+        return;
+      }
+
+      const result = await FilePicker.pickFiles({
+        types: ['application/pdf'],
+        readData: false,
+      });
+
+      if (result.files && result.files.length > 0) {
+        const paths = result.files.map(f => f.path).filter((p): p is string => !!p);
+        setSelectedFiles(paths);
+        
+        // Extrahiere gemeinsamen Ordnerpfad
+        if (paths.length > 0) {
+          const firstPath = paths[0];
+          const folderPath = firstPath.substring(0, firstPath.lastIndexOf('/'));
+          setFolderPath(folderPath);
+          setError('');
+        }
+      }
+    } catch (err) {
+      console.error('Fehler beim Datei-Picker:', err);
+      setError('Fehler bei der Dateiauswahl. Bitte versuche es erneut.');
+    }
+  };
+
   const handleFolderSave = async () => {
-    if (!folderPath.trim()) {
-      setError('Bitte gib einen Ordnerpfad ein');
+    if (!folderPath.trim() && selectedFiles.length === 0) {
+      setError('Bitte wähle einen Ordner oder Dateien aus');
+      return;
+    }
+
+    const pathToSave = folderPath.trim() || (selectedFiles.length > 0 ? 
+      selectedFiles[0].substring(0, selectedFiles[0].lastIndexOf('/')) : '');
+
+    if (!pathToSave) {
+      setError('Kein gültiger Pfad gefunden');
       return;
     }
 
     // Speichere Pfad
-    localStorage.setItem('ds_sheet_local_folder', folderPath);
+    localStorage.setItem('ds_sheet_local_folder', pathToSave);
     localStorage.setItem('ds_sheet_mode', 'local');
-    onComplete(folderPath);
+    onComplete(pathToSave);
   };
 
   const commonFolders = [
@@ -106,7 +147,31 @@ function LocalSetup({ onComplete }: LocalSetupProps) {
         </p>
 
         <div className="setup-form">
-          <label htmlFor="folder-path">Ordnerpfad:</label>
+          <button onClick={handleFilePicker} className="setup-btn picker-btn">
+            📂 Dateien durchsuchen
+          </button>
+
+          {selectedFiles.length > 0 && (
+            <div className="selected-files">
+              <p><strong>{selectedFiles.length} Dateien ausgewählt</strong></p>
+              <div className="file-list">
+                {selectedFiles.slice(0, 3).map((path, idx) => (
+                  <div key={idx} className="file-item">
+                    📄 {path.split('/').pop()}
+                  </div>
+                ))}
+                {selectedFiles.length > 3 && (
+                  <div className="file-item">... und {selectedFiles.length - 3} weitere</div>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className="or-divider">
+            <span>oder</span>
+          </div>
+
+          <label htmlFor="folder-path">Ordnerpfad manuell eingeben:</label>
           <input
             id="folder-path"
             type="text"
@@ -121,7 +186,7 @@ function LocalSetup({ onComplete }: LocalSetupProps) {
           {error && <div className="setup-error">{error}</div>}
 
           <button onClick={handleFolderSave} className="setup-btn">
-            Ordner verwenden
+            {selectedFiles.length > 0 ? 'Diese Dateien verwenden' : 'Ordner verwenden'}
           </button>
         </div>
 
