@@ -7,9 +7,20 @@ import PDFViewer from './PDFViewer';
 import NavigationControls from './NavigationControls';
 import './ViewerPage.css';
 
-function ViewerPage() {
+interface ViewerPageProps {
+  mode?: 'local' | 'server';
+}
+
+function ViewerPage({ mode = 'server' }: ViewerPageProps) {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  
+  // Mode wird später für lokale vs. Server-PDFs genutzt
+  const isLocalMode = mode === 'local';
+  if (isLocalMode) {
+    // TODO: Lade PDF von lokalem Speicher
+    console.log('Lokaler Modus aktiv');
+  }
   const [currentPage, setCurrentPage] = useState(1);
   const [numPages, setNumPages] = useState<number | null>(null);
   const [showControls, setShowControls] = useState(true);

@@ -6,10 +6,21 @@ import ScoreCard from './ScoreCard';
 import InstallPrompt from './InstallPrompt';
 import './LibraryView.css';
 
-function LibraryView() {
+interface LibraryViewProps {
+  mode?: 'local' | 'server';
+}
+
+function LibraryView({ mode = 'server' }: LibraryViewProps) {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFolder, setSelectedFolder] = useState<string>('');
+  
+  // Mode wird später für lokale vs. Server-Daten genutzt
+  const isLocalMode = mode === 'local';
+  if (isLocalMode) {
+    // TODO: Implementiere lokalen Datenzugriff
+    console.log('Lokaler Modus aktiv');
+  }
   
   const { data: scoresData, isLoading, error } = useScores(searchTerm, selectedFolder);
   const { data: healthData } = useHealth();
