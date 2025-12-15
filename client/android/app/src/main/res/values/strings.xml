@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">DS-Sheet</string>
+    <string name="title_activity_main">DS-Sheet</string>
+    <string name="package_name">com.dssheet.app</string>
+    <string name="custom_url_scheme">com.dssheet.app</string>
+</resources>

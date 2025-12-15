@@ -7,10 +7,8 @@ import axios from 'axios';
 import type { ScoreListResponse, ScoreDetailResponse, HealthResponse, FolderListResponse } from '../types/score';
 import { localDB, type LocalScore } from './localDatabase';
 
-const API_BASE_URL = typeof window !== 'undefined' && window.location.hostname !== 'localhost' 
-  ? `${window.location.protocol}//${window.location.hostname}:3000` 
-  : 'http://localhost:3000';
-const USE_LOCAL_MODE = false; // Disabled for now
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+const USE_LOCAL_MODE = import.meta.env.VITE_LOCAL_MODE === 'true' || !API_BASE_URL;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -39,11 +37,15 @@ export const scoresApi = {
   // Health-Check
   getHealth: async (): Promise<HealthResponse> => {
     if (USE_LOCAL_MODE) {
+      await localDB.init();
+      const scores = await localDB.getAllScores();
       return {
         status: 'ok',
-        noteRoot: '/local',
+        message: 'Local mode active',
+        timestamp: new Date().toISOString(),
+        noteRoot: 'local',
         accessible: true,
-        scoreCount: 0,
+        scoreCount: scores.length,
       };
     }
     
@@ -52,12 +54,15 @@ export const scoresApi = {
       return response.data;
     } catch (error) {
       // Fallback to local mode if server unavailable
+      await localDB.init();
+      const scores = await localDB.getAllScores();
       return {
-        status: 'error',
-        noteRoot: '/local',
-        accessible: false,
-        scoreCount: 0,
-        error: 'Server unavailable',
+        status: 'ok',
+        message: 'Server unavailable - using local mode',
+        timestamp: new Date().toISOString(),
+        noteRoot: 'local',
+        accessible: true,
+        scoreCount: scores.length,
       };
     }
   },
@@ -111,16 +116,8 @@ export const scoresApi = {
         throw new Error('Score not found');
       }
       
-      // Convert to ScoreDetailResponse format
       return {
-        id: score.id,
-        filename: score.title,
-        relativePath: '',
-        folder: score.folder || '',
-        fileSize: score.fileSize || 0,
-        modifiedAt: score.updatedAt,
-        pages: score.pageCount ?? null,
-        indexedAt: score.createdAt,
+        ...localScoreToApiFormat(score),
         exists: true,
       };
     }
@@ -137,16 +134,8 @@ export const scoresApi = {
         throw error;
       }
       
-      // Convert to ScoreDetailResponse format
       return {
-        id: score.id,
-        filename: score.title,
-        relativePath: '',
-        folder: score.folder || '',
-        fileSize: score.fileSize || 0,
-        modifiedAt: score.updatedAt,
-        pages: score.pageCount ?? null,
-        indexedAt: score.createdAt,
+        ...localScoreToApiFormat(score),
         exists: true,
       };
     }

@@ -16,6 +16,7 @@ export interface ScoreListResponse {
 
 export interface ScoreDetailResponse extends Score {
   exists: boolean;
+  score?: Score;
 }
 
 export interface HealthResponse {
@@ -24,6 +25,8 @@ export interface HealthResponse {
   accessible: boolean;
   scoreCount: number;
   error?: string;
+  message?: string;
+  timestamp?: string;
 }
 
 export interface FolderListResponse {
