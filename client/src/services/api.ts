@@ -1,14 +1,30 @@
 import axios from 'axios';
 import type { ScoreListResponse, ScoreDetailResponse, HealthResponse, FolderListResponse } from '../types/score';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+// API-Base-URL aus localStorage oder Environment
+const getApiBaseUrl = (): string => {
+  // 1. Prüfe localStorage (für dynamische Konfiguration)
+  const stored = localStorage.getItem('ds_sheet_server_url');
+  if (stored) {
+    return stored;
+  }
+  
+  // 2. Fallback auf Environment Variable
+  return import.meta.env.VITE_API_BASE_URL || '';
+};
 
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: getApiBaseUrl(),
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 10000, // 10 Sekunden Timeout
 });
+
+// Interceptor für dynamische URL-Updates
+export const updateApiBaseUrl = (newUrl: string) => {
+  api.defaults.baseURL = newUrl;
+};
 
 export const scoresApi = {
   // Health-Check
@@ -35,7 +51,7 @@ export const scoresApi = {
 
   // PDF-URL für einen Score
   getScoreFileUrl: (id: string): string => {
-    return `${API_BASE_URL}/api/scores/${id}/file`;
+    return `${getApiBaseUrl()}/api/scores/${id}/file`;
   },
 
   // Liste aller Ordner

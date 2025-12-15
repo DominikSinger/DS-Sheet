@@ -29,9 +29,20 @@ function LibraryView() {
     return (
       <div className="library-view">
         <div className="error-message">
-          <h2>❌ Fehler beim Laden</h2>
+          <h2>❌ Verbindungsfehler</h2>
           <p>{error instanceof Error ? error.message : 'Unbekannter Fehler'}</p>
-          <button onClick={() => window.location.reload()}>Neu laden</button>
+          <p style={{ marginTop: '16px', fontSize: '14px', color: '#666' }}>
+            Kann keine Verbindung zum Server herstellen. Bitte überprüfe deine Server-Konfiguration.
+          </p>
+          <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
+            <button onClick={() => window.location.reload()}>Neu laden</button>
+            <button 
+              onClick={() => window.location.href = '/config'}
+              style={{ background: '#2196F3' }}
+            >
+              Server konfigurieren
+            </button>
+          </div>
         </div>
       </div>
     );
