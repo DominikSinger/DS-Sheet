@@ -166,74 +166,94 @@ function LocalSetup({ onComplete }: LocalSetupProps) {
     <div className="local-setup">
       <div className="setup-card">
         <div className="setup-icon">🎵</div>
-        <h2>Lokaler Noten-Ordner</h2>
+        <h2>PDF-Noten auswählen</h2>
         <p className="setup-description">
-          Wähle den Ordner aus, in dem deine PDF-Noten gespeichert sind.
+          Wähle deine PDF-Noten aus, um sie in der App anzuzeigen.
         </p>
 
         <div className="setup-form">
+          {/* Hauptaktion: Dateien auswählen */}
           <button onClick={handleFilePicker} className="setup-btn picker-btn">
-            📂 Dateien durchsuchen
+            📂 PDF-Dateien auswählen
           </button>
 
+          {/* Ausgewählte Dateien anzeigen */}
           {selectedFiles.length > 0 && (
             <div className="selected-files">
-              <p><strong>{selectedFiles.length} Dateien ausgewählt</strong></p>
+              <p className="files-count">✓ {selectedFiles.length} Datei(en) ausgewählt</p>
               <div className="file-list">
-                {selectedFiles.slice(0, 3).map((path, idx) => (
+                {selectedFiles.slice(0, 5).map((path, idx) => (
                   <div key={idx} className="file-item">
                     📄 {path.split('/').pop()}
                   </div>
                 ))}
-                {selectedFiles.length > 3 && (
-                  <div className="file-item">... und {selectedFiles.length - 3} weitere</div>
+                {selectedFiles.length > 5 && (
+                  <div className="file-item more-files">
+                    ... und {selectedFiles.length - 5} weitere
+                  </div>
                 )}
               </div>
+              
+              {/* Deutlicher Bestätigungs-Button */}
+              <button onClick={handleFolderSave} className="setup-btn confirm-btn">
+                ✓ Diese Dateien verwenden
+              </button>
             </div>
           )}
-
-          <div className="or-divider">
-            <span>oder</span>
-          </div>
-
-          <label htmlFor="folder-path">Ordnerpfad manuell eingeben:</label>
-          <input
-            id="folder-path"
-            type="text"
-            value={folderPath}
-            onChange={(e) => {
-              setFolderPath(e.target.value);
-              setError('');
-            }}
-            placeholder="/storage/emulated/0/Music/Noten"
-          />
           
           {error && <div className="setup-error">{error}</div>}
-
-          <button onClick={handleFolderSave} className="setup-btn">
-            {selectedFiles.length > 0 ? 'Diese Dateien verwenden' : 'Ordner verwenden'}
-          </button>
         </div>
 
-        <div className="setup-help">
-          <h3>💡 Häufige Ordner:</h3>
-          <ul>
-            {commonFolders.map(path => (
-              <li key={path}>
-                <code>{path}</code>
-                <button 
-                  onClick={() => setFolderPath(path)}
-                  className="use-folder-btn"
-                >
-                  Verwenden
-                </button>
-              </li>
-            ))}
-          </ul>
+        {/* Erweiterte Optionen ausklappbar */}
+        <details className="advanced-options">
+          <summary>🔧 Erweiterte Optionen</summary>
+          
+          <div className="advanced-content">
+            <label htmlFor="folder-path">Ordnerpfad manuell eingeben:</label>
+            <div className="path-input-group">
+              <input
+                id="folder-path"
+                type="text"
+                value={folderPath}
+                onChange={(e) => {
+                  setFolderPath(e.target.value);
+                  setError('');
+                }}
+                placeholder="/storage/emulated/0/Music/Noten"
+              />
+              <button 
+                onClick={handleFolderSave} 
+                className="apply-path-btn"
+                disabled={!folderPath.trim()}
+              >
+                Übernehmen
+              </button>
+            </div>
 
-          <div className="setup-tip">
-            <strong>Tipp:</strong> Lege einen Ordner auf deinem Gerät an und kopiere 
-            alle PDF-Noten dorthin. Dann gib hier den vollständigen Pfad an.
+            <div className="common-folders">
+              <h4>Häufige Ordner:</h4>
+              {commonFolders.map(path => (
+                <button 
+                  key={path}
+                  onClick={() => setFolderPath(path)}
+                  className="folder-suggestion"
+                >
+                  📁 {path}
+                </button>
+              ))}
+            </div>
+          </div>
+        </details>
+
+        <div className="setup-help">
+          <div className="help-box">
+            <strong>💡 So funktioniert's:</strong>
+            <ol>
+              <li>Tippe auf "PDF-Dateien auswählen"</li>
+              <li>Wähle eine oder mehrere PDF-Noten aus</li>
+              <li>Tippe auf "Diese Dateien verwenden"</li>
+              <li>Fertig! Die Noten erscheinen in deiner Bibliothek</li>
+            </ol>
           </div>
         </div>
       </div>
