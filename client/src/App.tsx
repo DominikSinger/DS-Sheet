@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import LibraryView from './components/LibraryView';
 import ViewerPage from './components/ViewerPage';
 import OfflinePage from './components/OfflinePage';
@@ -168,7 +168,7 @@ function App() {
   }
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route path="/" element={<LibraryView mode={mode} />} />
         <Route path="/viewer/:id" element={<ViewerPage mode={mode} />} />
@@ -176,7 +176,7 @@ function App() {
         <Route path="/config/server" element={<ServerConfig onSave={handleServerSetup} />} />
         <Route path="/config/local" element={<LocalSetup onComplete={handleLocalSetup} />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
