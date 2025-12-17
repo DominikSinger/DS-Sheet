@@ -1,0 +1,53 @@
+==========================================
+  DS-Sheet Android APK Build
+==========================================
+
+[0;32m[INFO][0m Android SDK gefunden: /home/codespace/android-sdk
+
+[0;32m[INFO][0m Schritt 1/3: React-Frontend wird gebaut...
+
+> musiknoten-frontend@1.0.0 build
+> tsc && vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 214 modules transformed.
+node_modules/pdfjs-dist/build/pdf.js (1982:23): Use of eval in "node_modules/pdfjs-dist/build/pdf.js" is strongly discouraged as it poses security risks and may cause issues with minification.
+rendering chunks...
+computing gzip size...
+dist/registerSW.js                       0.13 kB
+dist/manifest.webmanifest                0.48 kB
+dist/index.html                          1.36 kB │ gzip:   0.60 kB
+dist/assets/index-CGv7tTA_.css          25.93 kB │ gzip:   5.58 kB
+dist/assets/localDatabase-IuqqUZg9.js    2.86 kB │ gzip:   0.91 kB
+dist/assets/web-Xdqm_kc7.js              8.73 kB │ gzip:   2.97 kB
+dist/assets/index-DvDFPoBM.js          672.94 kB │ gzip: 202.32 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 3.56s
+
+PWA v0.17.5
+mode      generateSW
+precache  17 entries (788.27 KiB)
+files generated
+  dist/sw.js
+  dist/workbox-354287e6.js
+[0;32m[INFO][0m ✓ Frontend-Build erfolgreich
+
+[0;32m[INFO][0m Schritt 2/3: Capacitor Sync...
+✔ Copying web assets from dist to android/app/src/main/assets/public in 14.15ms
+✔ Creating capacitor.config.json in android/app/src/main/assets in 584.28μs
+✔ copy android in 33.47ms
+✔ Updating Android plugins in 2.73ms
+[info] Found 2 Capacitor plugins for android:
+       @capacitor/filesystem@7.1.5
+       @capawesome/capacitor-file-picker@7.2.0
+✔ update android in 514.31ms
+[info] Sync finished in 0.595s
+[0;32m[INFO][0m ✓ Capacitor Sync erfolgreich
+
+[0;32m[INFO][0m Schritt 3/3: APK wird gebaut...
+[0;32m[INFO][0m Lösche alte APK-Dateien...

@@ -176,4 +176,4 @@ class LocalDatabase {
   }
 }
 
-export const localDB = new LocalDatabase();
+export const localDatabase = new LocalDatabase();

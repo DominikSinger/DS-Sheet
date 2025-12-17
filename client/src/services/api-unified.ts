@@ -5,7 +5,7 @@
 
 import axios from 'axios';
 import type { ScoreListResponse, ScoreDetailResponse, HealthResponse, FolderListResponse } from '../types/score';
-import { localDB, type LocalScore } from './localDatabase';
+import { localDatabase, type LocalScore } from './localDatabase';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 const USE_LOCAL_MODE = import.meta.env.VITE_LOCAL_MODE === 'true' || !API_BASE_URL;
@@ -37,8 +37,8 @@ export const scoresApi = {
   // Health-Check
   getHealth: async (): Promise<HealthResponse> => {
     if (USE_LOCAL_MODE) {
-      await localDB.init();
-      const scores = await localDB.getAllScores();
+      await localDatabase.init();
+      const scores = await localDatabase.getAllScores();
       return {
         status: 'ok',
         message: 'Local mode active',
@@ -54,8 +54,8 @@ export const scoresApi = {
       return response.data;
     } catch (error) {
       // Fallback to local mode if server unavailable
-      await localDB.init();
-      const scores = await localDB.getAllScores();
+      await localDatabase.init();
+      const scores = await localDatabase.getAllScores();
       return {
         status: 'ok',
         message: 'Server unavailable - using local mode',
@@ -70,16 +70,16 @@ export const scoresApi = {
   // Liste aller Noten
   getScores: async (search?: string, folder?: string): Promise<ScoreListResponse> => {
     if (USE_LOCAL_MODE) {
-      await localDB.init();
+      await localDatabase.init();
       
       let scores: LocalScore[];
       
       if (search) {
-        scores = await localDB.searchScores(search);
+        scores = await localDatabase.searchScores(search);
       } else if (folder) {
-        scores = await localDB.getScoresByFolder(folder);
+        scores = await localDatabase.getScoresByFolder(folder);
       } else {
-        scores = await localDB.getAllScores();
+        scores = await localDatabase.getAllScores();
       }
       
       return {
@@ -97,8 +97,8 @@ export const scoresApi = {
       return response.data;
     } catch (error) {
       // Fallback to local database
-      await localDB.init();
-      const scores = await localDB.getAllScores();
+      await localDatabase.init();
+      const scores = await localDatabase.getAllScores();
       return {
         scores: scores.map(localScoreToApiFormat),
         total: scores.length,
@@ -109,8 +109,8 @@ export const scoresApi = {
   // Einzelne Noten-Details
   getScoreDetail: async (id: string): Promise<ScoreDetailResponse> => {
     if (USE_LOCAL_MODE) {
-      await localDB.init();
-      const score = await localDB.getScore(id);
+      await localDatabase.init();
+      const score = await localDatabase.getScore(id);
       
       if (!score) {
         throw new Error('Score not found');
@@ -127,8 +127,8 @@ export const scoresApi = {
       return response.data;
     } catch (error) {
       // Fallback to local database
-      await localDB.init();
-      const score = await localDB.getScore(id);
+      await localDatabase.init();
+      const score = await localDatabase.getScore(id);
       
       if (!score) {
         throw error;
@@ -153,8 +153,8 @@ export const scoresApi = {
   // Get file as Blob (for local mode)
   getScoreFile: async (id: string): Promise<Blob | null> => {
     if (USE_LOCAL_MODE) {
-      await localDB.init();
-      return await localDB.getFile(id);
+      await localDatabase.init();
+      return await localDatabase.getFile(id);
     }
     
     try {
@@ -164,16 +164,16 @@ export const scoresApi = {
       return response.data;
     } catch (error) {
       // Try local fallback
-      await localDB.init();
-      return await localDB.getFile(id);
+      await localDatabase.init();
+      return await localDatabase.getFile(id);
     }
   },
 
   // Liste aller Ordner
   getFolders: async (): Promise<FolderListResponse> => {
     if (USE_LOCAL_MODE) {
-      await localDB.init();
-      const folders = await localDB.getFolders();
+      await localDatabase.init();
+      const folders = await localDatabase.getFolders();
       
       return {
         folders: folders,
@@ -185,8 +185,8 @@ export const scoresApi = {
       return response.data;
     } catch (error) {
       // Fallback to local database
-      await localDB.init();
-      const folders = await localDB.getFolders();
+      await localDatabase.init();
+      const folders = await localDatabase.getFolders();
       
       return {
         folders: folders,
@@ -196,24 +196,24 @@ export const scoresApi = {
 
   // Add new score (local mode only)
   addScore: async (score: LocalScore, file: File): Promise<void> => {
-    await localDB.init();
+    await localDatabase.init();
     
     // Save score metadata
-    await localDB.addScore(score);
+    await localDatabase.addScore(score);
     
     // Save file
-    await localDB.saveFile(score.id, file);
+    await localDatabase.saveFile(score.id, file);
   },
 
   // Update score (local mode only)
   updateScore: async (score: LocalScore): Promise<void> => {
-    await localDB.init();
-    await localDB.updateScore(score);
+    await localDatabase.init();
+    await localDatabase.updateScore(score);
   },
 
   // Delete score (local mode only)
   deleteScore: async (id: string): Promise<void> => {
-    await localDB.init();
-    await localDB.deleteScore(id);
+    await localDatabase.init();
+    await localDatabase.deleteScore(id);
   },
 };
