@@ -89,19 +89,32 @@ function LocalSetup({ onComplete }: LocalSetupProps) {
       return;
     }
 
-    setError('Scanne Ordner nach PDF-Dateien...');
+    setError(`Importiere ${selectedFiles.length} PDF-Datei(en)...`);
 
-    // Versuche Ordner zu scannen
     try {
-      const scanResult = await localFileService.scanDirectory(pathToSave);
-      
-      if (scanResult.errors.length > 0) {
-        console.warn('Scan-Fehler:', scanResult.errors);
-      }
-
-      // Wenn Dateien ausgewählt wurden, speichere diese
+      // Importiere ausgewählte Dateien direkt
       if (selectedFiles.length > 0) {
+        const result = await localFileService.importSelectedFiles(selectedFiles);
+        
+        if (result.errors.length > 0) {
+          console.warn('Import-Fehler:', result.errors);
+        }
+
+        // Speichere Dateipfade
         localStorage.setItem('ds_sheet_local_files', JSON.stringify(selectedFiles));
+        
+        // Zeige Erfolgsmeldung
+        setError(`✓ ${result.added} von ${result.scanned} Dateien erfolgreich importiert!`);
+        
+        // Warte kurz, damit Benutzer die Meldung sieht
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } else {
+        // Fallback: Versuche Ordner zu scannen
+        const scanResult = await localFileService.scanDirectory(pathToSave);
+        
+        if (scanResult.errors.length > 0) {
+          console.warn('Scan-Fehler:', scanResult.errors);
+        }
       }
 
       // Speichere Konfiguration
@@ -110,8 +123,8 @@ function LocalSetup({ onComplete }: LocalSetupProps) {
       
       onComplete(pathToSave);
     } catch (err) {
-      console.error('Fehler beim Scannen:', err);
-      setError('Konnte Ordner nicht scannen. Versuche es mit manuellem Dateipicker.');
+      console.error('Fehler beim Import:', err);
+      setError('Fehler beim Importieren der Dateien. Bitte versuche es erneut.');
     }
   };
 

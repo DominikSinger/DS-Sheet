@@ -74,16 +74,23 @@ echo ""
 log_info "Schritt 3/3: APK wird gebaut..."
 cd android
 
+# Lösche alte APKs
+log_info "Lösche alte APK-Dateien..."
+rm -f ../../install.apk
+rm -f ../../DS-Sheet*.apk
+
 ./gradlew assembleDebug
 
 if [ -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
     log_info "✓ APK erfolgreich erstellt!"
     echo ""
-    log_info "APK-Datei: client/android/app/build/outputs/apk/debug/app-debug.apk"
     
-    # Kopiere APK ins Root-Verzeichnis
-    cp app/build/outputs/apk/debug/app-debug.apk ../../DS-Sheet.apk
-    log_info "APK kopiert nach: client/DS-Sheet.apk"
+    # Kopiere APK als install.apk ins Root-Verzeichnis
+    cp app/build/outputs/apk/debug/app-debug.apk ../../install.apk
+    
+    # Dateigröße anzeigen
+    APK_SIZE=$(du -h ../../install.apk | cut -f1)
+    log_info "✓ APK gespeichert als: install.apk (${APK_SIZE})"
 else
     log_error "APK wurde nicht erstellt"
     exit 1
@@ -95,7 +102,7 @@ log_info "  Build erfolgreich! ✓"
 log_info "=========================================="
 echo ""
 echo "Nächste Schritte:"
-echo "1. Übertrage DS-Sheet.apk auf dein Android-Gerät"
+echo "1. Übertrage install.apk auf dein Android-Gerät"
 echo "2. Installiere die APK (Unbekannte Quellen erlauben)"
 echo "3. Starte DS-Sheet"
 echo ""

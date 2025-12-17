@@ -157,6 +157,61 @@ class LocalFileService {
   }
 
   /**
+   * Importiert ausgewählte Dateien direkt in die Datenbank
+   */
+  async importSelectedFiles(filePaths: string[]): Promise<ScanResult> {
+    const result: ScanResult = {
+      scanned: filePaths.length,
+      added: 0,
+      errors: [],
+    };
+
+    // Dynamischer Import von localDatabase
+    const { localDatabase } = await import('./localDatabase');
+    await localDatabase.init();
+
+    for (const filePath of filePaths) {
+      try {
+        const filename = filePath.split('/').pop() || 'unknown.pdf';
+        const folder = filePath.substring(0, filePath.lastIndexOf('/'));
+        
+        // Erstelle Score-Eintrag
+        const score = {
+          id: this.generateId(filePath),
+          title: filename.replace(/\.pdf$/i, ''),
+          composer: '',
+          folder: folder,
+          tags: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          fileSize: 0,
+        };
+
+        // Prüfe ob Score bereits existiert
+        const existing = await localDatabase.getScore(score.id);
+        if (!existing) {
+          await localDatabase.addScore(score);
+          result.added++;
+        } else {
+          // Aktualisiere bestehenden Score
+          await localDatabase.updateScore({
+            ...existing,
+            updatedAt: new Date().toISOString(),
+          });
+          result.added++;
+        }
+
+        // Speichere Dateipfad für späteren Zugriff
+        localStorage.setItem(`ds_sheet_file_path_${score.id}`, filePath);
+      } catch (error) {
+        result.errors.push(`${filePath}: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`);
+      }
+    }
+
+    return result;
+  }
+
+  /**
    * Generiert eine ID aus dem Pfad
    */
   private generateId(path: string): string {
