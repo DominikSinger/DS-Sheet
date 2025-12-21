@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
+import { Capacitor } from '@capacitor/core';
 import LibraryView from './components/LibraryView';
 import ViewerPage from './components/ViewerPage';
 import OfflinePage from './components/OfflinePage';
@@ -18,25 +19,45 @@ function App() {
   }, []);
 
   const checkConfiguration = () => {
-    // Prüfe, welcher Modus bereits konfiguriert ist
-    const savedMode = localStorage.getItem('ds_sheet_mode') as AppMode;
-    const localFolder = localStorage.getItem('ds_sheet_local_folder');
-    const serverUrl = localStorage.getItem('ds_sheet_server_url');
-    const envUrl = import.meta.env.VITE_API_BASE_URL;
+    try {
+      console.log('Checking configuration...');
+      console.log('Platform:', Capacitor.getPlatform());
+      console.log('Native Platform:', Capacitor.isNativePlatform());
+      
+      // Prüfe, welcher Modus bereits konfiguriert ist
+      const savedMode = localStorage.getItem('ds_sheet_mode') as AppMode;
+      const localFolder = localStorage.getItem('ds_sheet_local_folder');
+      const serverUrl = localStorage.getItem('ds_sheet_server_url');
+      const envUrl = import.meta.env.VITE_API_BASE_URL;
 
-    if (savedMode === 'local' && localFolder) {
-      setMode('local');
-    } else if (savedMode === 'server' && (serverUrl || envUrl)) {
-      setMode('server');
-      if (serverUrl) {
-        updateApiBaseUrl(serverUrl);
+      console.log('Saved mode:', savedMode);
+      console.log('Local folder:', localFolder);
+      
+      // Für native Apps: Standard auf 'local' setzen
+      if (Capacitor.isNativePlatform() && !savedMode) {
+        console.log('Native platform detected, setting local mode');
+        localStorage.setItem('ds_sheet_mode', 'local');
+        setMode('local');
+      } else if (savedMode === 'local' && localFolder) {
+        console.log('Using local mode');
+        setMode('local');
+      } else if (savedMode === 'server' && (serverUrl || envUrl)) {
+        console.log('Using server mode');
+        setMode('server');
+        if (serverUrl) {
+          updateApiBaseUrl(serverUrl);
+        }
+      } else {
+        console.log('No mode configured');
+        setMode('none');
       }
-    } else {
-      // Keine Konfiguration vorhanden - Standard: Lokal
-      setMode('none');
+    } catch (error) {
+      console.error('Error checking configuration:', error);
+      // Fallback zu local mode bei Fehler
+      setMode('local');
+    } finally {
+      setIsChecking(false);
     }
-    
-    setIsChecking(false);
   };
 
   const handleLocalSetup = (folderPath: string) => {

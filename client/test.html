@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: capacitor: https:;">
+    <title>Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #1e1e1e;
+            color: white;
+            font-family: system-ui;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .container {
+            text-align: center;
+            max-width: 400px;
+        }
+        .status {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .info {
+            background: #2d2d2d;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: left;
+            font-size: 14px;
+        }
+        .info div {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="status">✅</div>
+        <h1>DS-Sheet Test OK!</h1>
+        <p>WebView funktioniert</p>
+        <div class="info">
+            <div><strong>Status:</strong> <span id="status">Lädt...</span></div>
+            <div><strong>Platform:</strong> <span id="platform">-</span></div>
+            <div><strong>Native:</strong> <span id="native">-</span></div>
+            <div><strong>Time:</strong> <span id="time">-</span></div>
+        </div>
+    </div>
+    
+    <script>
+        console.log('Test page loaded!');
+        document.getElementById('status').textContent = 'Geladen ✓';
+        document.getElementById('time').textContent = new Date().toLocaleTimeString();
+        
+        // Teste Capacitor
+        if (typeof Capacitor !== 'undefined') {
+            document.getElementById('platform').textContent = Capacitor.getPlatform();
+            document.getElementById('native').textContent = Capacitor.isNativePlatform() ? 'Ja' : 'Nein';
+        } else {
+            document.getElementById('platform').textContent = 'Web';
+            document.getElementById('native').textContent = 'Nein';
+        }
+        
+        console.log('All tests passed!');
+    </script>
+</body>
+</html>

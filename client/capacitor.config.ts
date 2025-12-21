@@ -6,15 +6,24 @@ const config: CapacitorConfig = {
   webDir: 'dist',
   plugins: {
     SplashScreen: {
-      launchShowDuration: 2000,
+      launchShowDuration: 0,
+      launchAutoHide: false,
       backgroundColor: '#1e1e1e',
-      showSpinner: false,
+      showSpinner: true,
+      androidSpinnerStyle: 'large',
+      spinnerColor: '#4CAF50',
     },
   },
   server: {
-    // For local standalone mode
     androidScheme: 'https',
     iosScheme: 'capacitor',
+    cleartext: true,
+    allowNavigation: ['*'],
+  },
+  android: {
+    allowMixedContent: true,
+    captureInput: true,
+    webContentsDebuggingEnabled: true,
   },
 };
 

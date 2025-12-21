@@ -74,23 +74,30 @@ echo ""
 log_info "Schritt 3/3: APK wird gebaut..."
 cd android
 
-# Lösche alte APKs
+# Lösche alte APKs im Root und Build-Ordner
 log_info "Lösche alte APK-Dateien..."
 rm -f ../../install.apk
 rm -f ../../DS-Sheet*.apk
+rm -rf app/build/outputs/apk/
 
+# Cleane vorherigen Build
+./gradlew clean
+
+# Baue Debug APK
 ./gradlew assembleDebug
 
 if [ -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
     log_info "✓ APK erfolgreich erstellt!"
     echo ""
     
-    # Kopiere APK als install.apk ins Root-Verzeichnis
+    # Kopiere APK als install.apk ins Root-Verzeichnis (überschreibt immer)
     cp app/build/outputs/apk/debug/app-debug.apk ../../install.apk
     
-    # Dateigröße anzeigen
+    # Dateigröße und Hash anzeigen
     APK_SIZE=$(du -h ../../install.apk | cut -f1)
+    APK_HASH=$(sha256sum ../../install.apk | cut -d' ' -f1 | cut -c1-8)
     log_info "✓ APK gespeichert als: install.apk (${APK_SIZE})"
+    log_info "  Hash: ${APK_HASH}"
 else
     log_error "APK wurde nicht erstellt"
     exit 1
