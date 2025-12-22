@@ -42,14 +42,14 @@ class ErrorBoundary extends Component<
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: '#1e1e1e',
-          color: 'white',
+          background: '#ffffff',
+          color: '#333',
           padding: '20px'
         }}>
           <div style={{ textAlign: 'center', maxWidth: '500px' }}>
             <div style={{ fontSize: '64px', marginBottom: '20px' }}>⚠️</div>
-            <h1 style={{ fontSize: '24px', marginBottom: '16px' }}>Fehler beim Laden</h1>
-            <p style={{ color: '#aaa', marginBottom: '24px' }}>
+            <h1 style={{ fontSize: '24px', marginBottom: '16px', color: '#333' }}>Fehler beim Laden</h1>
+            <p style={{ color: '#666', marginBottom: '24px' }}>
               {this.state.error?.message || 'Ein unbekannter Fehler ist aufgetreten'}
             </p>
             <button
@@ -116,15 +116,16 @@ const initApp = async () => {
     );
 
     // Verstecke SplashScreen nach erfolgreichem Rendering
+    // Warte länger, damit die App vollständig initialisiert ist
     if (Capacitor.isNativePlatform()) {
       setTimeout(async () => {
         try {
-          await SplashScreen.hide();
+          await SplashScreen.hide({ fadeOutDuration: 300 });
           console.log('SplashScreen hidden');
         } catch (e) {
           console.error('Error hiding splash screen:', e);
         }
-      }, 500);
+      }, 1500);
     }
   } catch (error) {
     console.error('Error initializing app:', error);
@@ -133,11 +134,11 @@ const initApp = async () => {
     const root = document.getElementById('root');
     if (root) {
       root.innerHTML = `
-        <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #1e1e1e; color: white; padding: 20px;">
+        <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #ffffff; color: #333; padding: 20px;">
           <div style="text-align: center; max-width: 500px;">
             <div style="font-size: 64px; margin-bottom: 20px;">⚠️</div>
-            <h1 style="font-size: 24px; margin-bottom: 16px;">Fehler beim Laden</h1>
-            <p style="color: #aaa; margin-bottom: 24px;">${error}</p>
+            <h1 style="font-size: 24px; margin-bottom: 16px; color: #333;">Fehler beim Laden</h1>
+            <p style="color: #666; margin-bottom: 24px;">${error}</p>
             <button onclick="window.location.reload()" style="padding: 12px 24px; background: #4CAF50; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">
               App neu laden
             </button>

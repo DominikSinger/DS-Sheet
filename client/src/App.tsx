@@ -83,12 +83,12 @@ function App() {
         alignItems: 'center', 
         justifyContent: 'center', 
         minHeight: '100vh',
-        background: '#1e1e1e',
-        color: 'white'
+        background: '#ffffff',
+        color: '#333'
       }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '48px', marginBottom: '20px' }}>🎵</div>
-          <div>DS-Sheet wird geladen...</div>
+          <div style={{ fontSize: '18px', fontWeight: '500' }}>DS-Sheet wird geladen...</div>
         </div>
       </div>
     );
